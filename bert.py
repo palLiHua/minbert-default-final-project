@@ -51,11 +51,12 @@ class BertSelfAttention(nn.Module):
     key = key.transpose(2,3)
     alpha = torch.matmul(query, key)
     alpha += attention_mask
+    alpha = alpha / (math.sqrt(key.size(-1)))
     alpha = F.softmax(alpha, -1)
     V = torch.matmul(alpha, value)
     bs, num_attention, seq_len, output = V.shape[:]
     V = V.transpose(1,2)
-    V = V.view(bs, seq_len, num_attention * output)
+    V = V.reshape(bs, seq_len, num_attention * output)
     return V
 
   def forward(self, hidden_states, attention_mask):
